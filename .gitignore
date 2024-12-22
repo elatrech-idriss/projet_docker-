@@ -1,0 +1,7 @@
+# Ignorer les fichiers et dossiers générés automatiquement
+node_modules/
+dist/
+build/
+.env
+*.log
+
