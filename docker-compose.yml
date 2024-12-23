@@ -1,0 +1,60 @@
+version: '3.8'
+
+services:
+  backend:
+    container_name: backend
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - "5000:5000"
+    environment:
+      - DATABASE_URL=mysql+pymysql://root:secret@db/dbname
+    networks:
+      - app-network
+
+  frontend:
+    container_name: frontend
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+    environment:
+      - REACT_APP_API_URL=/users  # Utilisation d'une URL relative pour passer par Nginx
+    networks:
+      - app-network
+
+  nginx:
+    image: nginx:alpine
+    container_name: nginx
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf  # Monte le fichier nginx.conf dans le conteneur
+      - ./frontend/build:/usr/share/nginx/html  # Monte les fichiers du frontend
+    ports:
+      - "80:80"  # Expose le port 80 pour accéder à l'application via http://localhost
+    depends_on:
+      - backend
+      - frontend
+    networks:
+      - app-network
+
+  db:
+    container_name: mysql-db
+    image: mysql:8.0
+    environment:
+      MYSQL_ROOT_PASSWORD: secret
+      MYSQL_DATABASE: dbname
+    volumes:
+      - db_data:/var/lib/mysql
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
+
+volumes:
+  db_data:

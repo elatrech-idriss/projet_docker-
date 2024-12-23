@@ -1,13 +1,22 @@
-# Étape de construction
-FROM node:18 AS build
-WORKDIR /app
-COPY package.json package-lock.json ./
-RUN npm install
-COPY . .
-RUN npm run build
+# Utilise l'image officielle Node.js comme base
+FROM node:16
 
-# Étape de production
-FROM nginx:alpine
-COPY --from=build /app/build /usr/share/nginx/html
-EXPOSE 80
-CMD ["nginx", "-g", "daemon off;"]
+# Crée et définit le répertoire de travail
+WORKDIR /app
+
+# Copie le fichier package.json et package-lock.json
+COPY package.json package-lock.json ./
+
+# Installe les dépendances
+RUN npm install
+
+# Copie tout le code source
+COPY . .
+
+# Expose le port 3000 pour React
+EXPOSE 3000
+
+# Commande pour démarrer l'application React
+CMD ["npm", "start"]
+
+ENV WDS_SOCKET_PORT=0

@@ -5,9 +5,13 @@ import UserList from './components/UserList';
 const App = () => {
   const [users, setUsers] = useState([]);
 
+  // Utilisation de l'URL relative pour passer par Nginx
+  const apiUrl = process.env.REACT_APP_API_URL || ''; 
+  console.log('API URL utilisée:', apiUrl);
+
   // Charger les utilisateurs depuis le backend
   useEffect(() => {
-    fetch('http://localhost:5000/users')
+    fetch(`${apiUrl}`) // Corrigé pour éviter /users/users
       .then((response) => response.json())
       .then((data) => setUsers(data))
       .catch((error) => console.error('Erreur lors du chargement des utilisateurs:', error));
